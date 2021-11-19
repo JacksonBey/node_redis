@@ -1,16 +1,16 @@
 const express = require('express');
-const {readFile, readFileSync} = require('fs');
+const {readFile, readFileSync} = require('fs').promises;
 
 const app = express();
 
-app.get('/', (req, response) => {
-  readFile('./home.html', 'utf8', (err, html) => {
-    if (err) {
-      response.status(500).send('Sorry out of order');
-    }
-    response.send(html);
-  })
-})
+app.get('/', async (req, response) => {
+  // readFile('./home.html', 'utf8', (err, html) => {
+  //   if (err) {
+  //     response.status(500).send('Sorry out of order');
+  //   }
+  //   response.send(html);
+  response.send(await readFile('./home.html', 'utf8'));
+});
 
 app.listen(process.env.PORT || 3000, () => console.log('App available on http://localhost:3000'));
 
