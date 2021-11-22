@@ -24,18 +24,25 @@ const setData = (pokeName, data) => {
           </div>`
 }
 
+// cache middleware
+const cache = (req, res, next) => {
+  const {pokeName} = req.params;
+  client.get(pokeName, (err, data) => {
+    if(err) throw err;
+    if(data){
+      res.send(setData(pokeName, JSON.parse(data)));
+    } else {
+      next();
+    }
+  });
+}
+
 // this function gets a random pokemon's name from pokeapi
 const getPokemonName = async (req, res, next) => {
-    // const response = await fetch('https://pokeapi.co/api/v2/pokemon/');
-    // const data = await response.json();
-    // const randomPokemon = data.results[Math.floor(Math.random() * data.results.length)];
-    // return randomPokemon.name;
     try{
-
       const {pokeName} = req.params;
       const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokeName}`);
       const data = await response.json();
-      
       //set data to redis
       client.setex(pokeName,3600, JSON.stringify(data));
 
@@ -48,7 +55,7 @@ const getPokemonName = async (req, res, next) => {
 };
 
 
-app.get("/pokemon/:pokeName", getPokemonName);
+app.get("/pokemon/:pokeName",cache, getPokemonName);
 
 
 
