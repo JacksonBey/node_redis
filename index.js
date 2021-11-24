@@ -4,11 +4,6 @@ const {readFile, readFileSync} = require('fs').promises;
 const fetch = require('node-fetch');
 const redis = require('redis');
 
-
-
-
-
-
 const app = express();
 
 const PORT = process.env.PORT || 3000;
@@ -24,6 +19,16 @@ const setData = (pokeName, data) => {
           </div>`
 }
 
+const setAndReturn5 = (key) => {
+  client.setex(key, 3600, '5');
+  client.get(key)
+}
+
+const sumNum =(num1, num2) => {
+  return num1 + num2;
+}
+
+
 // cache middleware
 const cache = (req, res, next) => {
   const {pokeName} = req.params;
@@ -37,7 +42,7 @@ const cache = (req, res, next) => {
   });
 }
 
-// this function gets a random pokemon's name from pokeapi
+// this function gets a pokemon from pokeapi
 const getPokemonName = async (req, res, next) => {
     try{
       const {pokeName} = req.params;
@@ -63,7 +68,13 @@ app.listen(3000, () => {
   console.log('listening on port 3000');
 })
 
-
+// export all the functions in this file
+module.exports = {
+  getPokemonName,
+  cache,
+  setAndReturn5,
+  sumNum,
+}
 
 
 
